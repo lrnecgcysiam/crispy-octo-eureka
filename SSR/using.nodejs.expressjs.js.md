@@ -1,0 +1,236 @@
+// If you want to determine the appropriate video on 
+// the server side with Node.js and then render the HTML
+//  to the client, you’ll need to use a templating engine 
+// like EJS, Pug, or Handlebars.This approach involves 
+// determining the user’s time zone from the client and 
+// sending that information to the server when the request is made.
+
+// For example, here’s how you can do it using Express and EJS:
+
+// 1.	Install necessary packages:
+
+// npm install express ejs
+
+
+// 2.	Set up the Node.js server:
+
+const express = require('express');
+const app = express();
+const path = require('path');
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'timezone.html'));
+});
+
+app.get('/video', (req, res) => {
+    const { timezoneOffset } = req.query;
+    const currentTime = new Date(Date.now() - timezoneOffset * 60000);
+    const hours = currentTime.getUTCHours();
+
+    let videoFilename;
+
+    if (hours >= 6 && hours < 12) {
+        videoFilename = "morning.webm";
+    } else if (hours >= 12 && hours < 18) {
+        videoFilename = "afternoon.webm";
+    } else if (hours >= 18 && hours < 21) {
+        videoFilename = "evening.webm";
+    } else {
+        videoFilename = "night.webm";
+    }
+
+    res.render('index', { videoFilename });
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
+
+	3.	Create the timezone.html file in the public directory:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Determine Timezone</title>
+</head>
+<body>
+    <script>
+        // Get the user's timezone offset in minutes
+        const timezoneOffset = new Date().getTimezoneOffset();
+
+        // Redirect to the server with the timezone offset as a query parameter
+        window.location.href = `/video?timezoneOffset=${timezoneOffset}`;
+    </script>
+</body>
+</html>
+
+
+	4.	Create the index.ejs file in the views directory:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Background Example</title>
+    <style>
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-background">
+        <video autoplay muted playsinline loop id="background-video">
+            <source src="/videos/<%= videoFilename %>" type="video/webm">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</body>
+</html>
+
+
+
+In this setup:
+
+	1.	When a user visits the root URL /, they are served the timezone.html file, which uses JavaScript to get the user’s local timezone offset and redirects to /video with the timezone offset as a query parameter.
+	2.	The server then calculates the current time based on the user’s timezone offset and selects the appropriate video filename.
+	3.	The selected video filename is passed to the index.ejs template, which renders the HTML with the correct video source for the user’s local time.
+
+Make sure you have your video files (morning.webm, afternoon.webm, evening.webm, night.webm) in the public/videos/ directory to be served correctly.If you want to determine the appropriate video on the server side with Node.js and then render the HTML to the client, you’ll need to use a templating engine like EJS, Pug, or Handlebars. This approach involves determining the user’s time zone from the client and sending that information to the server when the request is made.
+
+For example, here’s how you can do it using Express and EJS:
+
+	1.	Install necessary packages:
+
+npm install express ejs
+
+
+	2.	Set up the Node.js server:
+
+const express = require('express');
+const app = express();
+const path = require('path');
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'timezone.html'));
+});
+
+app.get('/video', (req, res) => {
+    const { timezoneOffset } = req.query;
+    const currentTime = new Date(Date.now() - timezoneOffset * 60000);
+    const hours = currentTime.getUTCHours();
+
+    let videoFilename;
+
+    if (hours >= 6 && hours < 12) {
+        videoFilename = "morning.webm";
+    } else if (hours >= 12 && hours < 18) {
+        videoFilename = "afternoon.webm";
+    } else if (hours >= 18 && hours < 21) {
+        videoFilename = "evening.webm";
+    } else {
+        videoFilename = "night.webm";
+    }
+
+    res.render('index', { videoFilename });
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
+
+	3.	Create the timezone.html file in the public directory:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Determine Timezone</title>
+</head>
+<body>
+    <script>
+        // Get the user's timezone offset in minutes
+        const timezoneOffset = new Date().getTimezoneOffset();
+
+        // Redirect to the server with the timezone offset as a query parameter
+        window.location.href = `/video?timezoneOffset=${timezoneOffset}`;
+    </script>
+</body>
+</html>
+
+
+	4.	Create the index.ejs file in the views directory:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Background Example</title>
+    <style>
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-background">
+        <video autoplay muted playsinline loop id="background-video">
+            <source src="/videos/<%= videoFilename %>" type="video/webm">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</body>
+</html>
+
+
+
+                                    In this setup:
+
+                                    1.	When a user visits the root URL /, they are served the timezone.html file, which uses JavaScript to get the user’s local timezone offset and redirects to /video with the timezone offset as a query parameter.
+                                    2.	The server then calculates the current time based on the user’s timezone offset and selects the appropriate video filename.
+                                    3.	The selected video filename is passed to the index.ejs template, which renders the HTML with the correct video source for the user’s local time.
+
+                                    Make sure you have your video files (morning.webm, afternoon.webm, evening.webm, night.webm) in the public/videos/ directory to be served correctly.
